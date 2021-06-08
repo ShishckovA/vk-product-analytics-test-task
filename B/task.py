@@ -14,8 +14,8 @@ class Task:
     def execute(self):
         logging.info(f"Started task {self.id}")
 
+        time.sleep(2)  # let's imagine task runs 2 seconds
         new_value = self.value ** 2
-        time.sleep(10 - self.id)
         self.value = new_value
         self.status = "completed"
 
