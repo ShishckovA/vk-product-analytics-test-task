@@ -1,0 +1,234 @@
+\documentclass[a4paper, 12pt]{article} 
+\usepackage[utf8]{inputenc} 
+\usepackage[russian]{babel} 
+\usepackage[left=2cm, right=2cm, top=1cm, bottom=2cm]{geometry} 
+\usepackage{indentfirst} 
+\usepackage[intlimits]{amsmath}
+\usepackage{amsfonts, amsthm, mathtools, amssymb, icomma, units}
+\usepackage{amsthm} 
+\usepackage{graphicx} 
+\usepackage{tikz} 
+\usepackage{enumitem} 
+\usepackage{dcolumn}
+\usepackage{ulem}
+\usepackage{setspace}
+
+
+\usepackage{lipsum}
+\setlength{\parindent}{0ex}
+\onehalfspacing
+\everymath{\displaystyle}
+
+\newcommand{\N}{\mathbb {N}}
+\newcommand{\Z}{\mathbb {Z}}
+\newcommand{\R}{\mathbb {R}}
+\newcommand{\Q}{\mathbb {Q}}
+\newcommand{\prob}[1]{\mathbb {P} \left[ #1 \right]}
+\newcommand{\limix}{\lim_{x\rightarrow\infty}}
+\newcommand{\limit}{\lim_{t\rightarrow\infty}}
+\newcommand{\limzx}{\lim_{x\rightarrow 0}}
+\newcommand{\limzt}{\lim_{t\rightarrow 0}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\la}{\leftarrow}
+\newcommand{\lra}{\Leftrightarrow}
+
+\renewcommand{\le}{\leqslant}
+
+\renewcommand{\ge}{\geqslant}
+\newcommand{\sol}{\noindent \textbf{Решение.}}
+\newcommand*{\dlim}[2]{\underset{y \to #2}{\lim\limits_{x \to #1}}}
+
+\renewcommand{\l}{\left(}
+\renewcommand{\r}{\right)}
+
+\newcommand{\p}{\partial}
+\renewcommand{\i}{\infty}
+\usepackage{comment}
+\title{Тестовое задание для стажёра команды продуктовой аналитики, часть A}
+\author{Выполнил: Шишков Алексей\\ФКН ВШЭ, прикладная математика и информатика, 2 курс}
+\date{}
+
+\newcommand{\z}[1]{\section*{Задача #1.}}
+\newcommand{\cv}[1]{\left\{\begin{array}{c}#1\end{array}\right\}}
+
+\newcommand{\summ}{\sum_{n=1}^{\infty}}
+\newcommand{\summm}[1]{\sum_{n=#1}^{\infty}}
+\newcommand{\cov}{\text{cov}}
+
+
+
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\section*{Часть A.}
+\end{center}
+
+\z 1
+
+Найдём MSE для текущей модели. Она считается по формуле $$\frac{(y_1 - y'_1) ^ 2 + ... + (y_n - y'_n) ^ 2}{n},$$ 
+
+где $y$ -- верные значения, $y'$ -- значения, полученные с помощью модели. Нам дано, что $$y_1 - y'_1 = \ldots = y_{80} - y'_{80} = 0.5,$$ $$ y_{81} - y'_{81} = \ldots = y_{100} - y'_{100} = -0.3.$$ MSE в этом случае равно $$\frac{0.5 ^ 2 + \ldots + 0.5^2 + (-0.3)^2 + \ldots + (-0.3)^2} {100} =\frac{ 0.25 \cdot 80 + 0.09 \cdot 20}{100} = 0.218.$$
+
+Если мы прибавим $C$ ко всем предсказаниям, то мы получим новые предсказания \linebreak $y''_i = y'_i + C$. MSE тогда будет равняться $$\frac{(0.5 - C) ^ 2 + ... + (0.5 - C)^2 + (-0.3 - C)^2 + ... + (-0.3 - C)^2}{100} =$$ $$= \frac{20 - 80C + 80C^2 + 20C^2 + 12C + 1.8} {100} = C^2 - 0.68C + 0.218.$$ Нам хочется минимизировать эту функцию по $C$. Это парабола ветвями вверх, минимум находится в вершине, то есть в $C = \frac{0.68}{2}  = \frac{68}{200}= \frac{17}{50}$, и MSE тогда равно $\frac{64}{625}$.
+
+Также можно посчитать, для каких $C$ ответ получается меньше, чем $0.218$, для этого надо решить неравенство $C^2 - 0.68C + 0.218 < 0.218$. Решением является $0 < C < \frac{17}{25}$.
+
+\textbf{Ответ}: да, константа существует, можно взять любое $C$ из $\l0, \frac{17}{25}\r$. Для достижения минимального MSE стоит взять $C = \frac{17}{50}$.
+
+
+\z 2
+
+Отрицательные значения может возвращать алгоритм градиентного бустинга. Для того, чтобы понять, почему так происходит, обратимся к способу построения обеих моделей.
+
+Для случайного леса несколько деревьев решения строятся с помощью бэггинга, для предсказания используется усреднение ответов всех деревьев. А так как каждое дерево может возвращать только усреднение нескольких (возможно --- одного) ответа обучающей выборки (оно усредняет значения в листах), то можно сказать, что в случайном лесе ответом может быть только сумма ответов обучающей выборки с неотрицательными коэффициентами. Так как все ответы обучающей выборки неотрицательны, то и результат предсказания не может быть отрицательным.
+
+В градиентом бустинге тоже используются решающие деревья. Однако они строятся последовательно, и на каждом шаге для следующего дерева подбирается коэффициент, с которым оно берётся. И этот коэффициент уже может быть каким угодно, так что в итоге ответы могут быть отрицательными.
+
+\textbf{Ответ:} в градиентном бустинге.
+
+
+\z 3
+
+Такое могло произойти по нескольким причинам.
+
+Во-первых, $R^2$ может не так хорошо показывать то, от чего мы пытались избавиться. В одной части выборки мы могли улучшить отличие дисперсии от реальных значений, в другой --- ухудшить, и в среднем результат был бы таким же.
+
+Во-вторых, наша модель может упереться в свой предсказательный максимум. Возможно, мы выбрали неправильную модель, и даже если мы будем пытаться улучшить построение модели, ничего не выйдет.
+
+В-третьих, возможно в исходных данных могли быть много выбросов и плохих объектов, что не позволяет модели хорошо работать.
+
+В-четвёртых, мы могли ошибиться при построении модели. Стоит ещё раз перепроверить код, библиотеки, перечитать документацию и проверить расчёты.
+
+\z 4
+
+Стандартное отклонение $n$ величин считается по формуле $$\sigma = \sqrt{\frac{\sum_{i=1}^n \l x_i - M\r^2}{n} },$$
+
+где $x_i$ --- значение $i$-й величины, $M$ --- среднее арифметическое $n$ величин: $\frac{\sum_{i=1}^n x_i}{n}$. Раскроем скобки в формуле подсчёта $\sigma$: 
+
+$$\sqrt{\frac{\sum_{i=1}^n \l x_i - M\r^2}{n-1} } = \sqrt{\frac{\sum_{i=1}^n \l x_i^2 - 2x_iM + M^2\r}{n} } = \sqrt{\frac{ \sum_{i=1}^n x_i^2 - 2M \sum_{i=1}^n x_i + nM^2 }{n}} =$$ $$=\sqrt{\frac{ \sum_{i=1}^n x_i^2 - 2nM  + nM^2 }{n}} = \sqrt{\frac{ \sum_{i=1}^n x_i^2 -nM^2 }{n}} = \sqrt{\frac{ \sum_{i=1}^n x_i^2 -  \frac{ \l \sum_{i=1}^n x_i\r^2}{n}}{n}}$$
+
+Таким образом, храня и эффективно пересчитывая в одной переменной сумму значений, во второй --- сумму квадратов, в третьей --- общее число обработанных чисел, можно использовать эту формулу для подсчёта стандартного отклонения. Памяти для этого нужно всего 24 бита на каждый float, что укладывается в половину от ста мегабайт.
+
+Полный код можно увидеть в файле \texttt{./A/4-stream-std.py}.
+
+
+\z 5
+
+Число задач в запросах я обозначу как \texttt{\{X\}}.
+
+\begin{comment}
+Нас устраивают два типа задач: те, которые завершились не с первой попытки и те, что вообще не завершились. Первым запросом определим первый тип, вторым --- второй, и соединим результаты запросов с помощью \texttt{UNION}.
+
+Напишем первый запрос. Если задача завершилась не с первой попытки, то её \texttt{task\_id} больше 100, и изначальный \texttt{id} равен остатку от \texttt{task\_id} по модулю 100, так как при каждом перезапуске это число не менялось. Таким образом, мы выбираем те \texttt{task\_id}, которые больше 100 и рассматриваем их остатки по модулю 100.
+
+Первый запрос:
+\begin{verbatim}
+SELECT MOD(task_id, {X}) AS task_base_id FROM tasks WHERE task_id >= {X};
+\end{verbatim}
+
+Второй запрос немного сложнее. Нам надо выяснить, каких остатков при делении на 100 нет среди остатков \texttt{task\_id} при делении на 100. Для этого сначала научимся генерировать множество остатков. Это можно сделать с помощью команды \texttt{GENERATE\_SERIES(from,~to)}. Она создаёт набор чисел от \texttt{from} до \texttt{to} (обе границы включительно). Теперь сделаем \texttt{JOIN} этих таблиц, и возьмём те строчки, где к \texttt{generate\_series} приклеилось \texttt{NULL} --- это и будет означать отсутствие конкретного остатка.
+\newpage
+Второй запрос:
+\begin{verbatim}
+SELECT generate_series AS task_base_id FROM
+(tasks RIGHT JOIN GENERATE_SERIES(0, {X-1}) ON MOD(task_id, {X}) = generate_series)
+WHERE task_id IS NULL;
+\end{verbatim}
+
+Соединив результаты этих запросов, получаем запрос, который требовался.
+
+Итоговый запрос:
+\begin{verbatim}
+SELECT MOD(task_id, {X}) AS task_base_id FROM tasks WHERE task_id >= {X}
+UNION
+SELECT generate_series AS task_base_id FROM
+(tasks RIGHT JOIN GENERATE_SERIES(0, {X-1}) ON MOD(task_id, {X}) = generate_series)
+WHERE task_id IS NULL;
+\end{verbatim}
+
+В случае недоступности функции \texttt{GENERATE\_SERIES} из-за другой СУБД можно использовать её аналоги (например, \texttt{seq\_0\_to\_\{X-1\}}). Если же и этого нет, второй запрос придётся переписывать чуть менее красиво:
+
+\begin{verbatim}
+SELECT nums.num AS task_base_id FROM tasks RIGHT JOIN (
+    SELECT decs_seq.decs * 10 + ones_seq.ones AS num FROM 
+    (SELECT 0 AS decs 
+    UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 
+    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 
+    UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 
+    ) AS decs_seq 
+    CROSS JOIN
+    (SELECT 0 AS ones 
+    UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 
+    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 
+    UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+    ) AS ones_seq
+    WHERE decs * 10 + ones < {X}
+) AS nums
+ON MOD(tasks.task_id, {X}) = nums.num 
+WHERE tasks.task_id IS NULL;
+\end{verbatim}
+
+Хочется отметить, что этот запрос можно использовать только для $X \le 100$, иначе нужно добавлять перебор сотен, тысяч и так далее (до $\log_{10}X$).
+
+\end{comment}
+
+Из условия следует, что задачи выполняются подряд, и процесс прекращается, если $i$-я задача достигла максимального числа перезапусков. 
+
+Первым запросом выберем задачи, которые выполнились, но не с первого раза. Для этого рассмотрим номера задач в таблице, которые больше 100, и возьмём их по модулю 100. 
+
+\begin{verbatim}
+SELECT MOD(task_id, {X}) AS task_base_id FROM tasks WHERE task_id >= {X};
+\end{verbatim}
+
+Далее возможно есть задача (одна), которая так и не выполнилась. Для того, чтобы вычислить её id, можно взять максимум по id среди всех выполненных задач (то есть максимум модулей) и прибавить 1. Если полученное число будет меньше 100, то надо объединить результат прошлого запроса с этим числом.
+
+
+
+\begin{verbatim}
+SELECT task_base_id FROM (
+  SELECT MAX (done.task_base_id) + 1 as task_base_id from (
+    SELECT MOD(task_id, {X}) AS task_base_id FROM tasks
+  ) AS done
+) AS first_not_done WHERE task_base_id < {X}
+\end{verbatim}
+
+Таким образом, объединённый запрос будет выглядеть как 
+
+\begin{verbatim}
+SELECT MOD(task_id, {X}) AS task_base_id FROM tasks WHERE task_id >= {X}
+UNION
+SELECT task_base_id FROM (
+  SELECT MAX (done.task_base_id) + 1 as task_base_id from (
+    SELECT MOD(task_id, {X}) AS task_base_id FROM tasks
+  ) AS done
+) AS first_not_done WHERE task_base_id < {X};
+\end{verbatim}
+
+
+Код запроса также можно найти в файле \texttt{./A/5.sql}.
+
+
+\begin{center}
+
+
+
+\section*{Часть B.}
+\end{center}
+
+Главная проблема в коде, который был предоставлен, состоит в том, что функция обновления \texttt{Counter}-а не является атомарной, но вызывалась параллельно. Это приводило к тому, что некоторые обновления не учитывались и забывались: если в \texttt{Counter} с текущим значением 0 придёт два обновления одновременно, то нули запишется в переменные local, оба нуля как-то увеличатся, а потом функция, которая записывает значение второй по счёту затрёт изменения, которые были сделаны первой функцией (так как \texttt{Counter.value} уже будет изменено, а \texttt{local} во второй функции не будет знать об этих изменениях).
+
+Эту можно исправить таким образом: убрать сохранение данных в локальную переменную функции, а изменять значение  \texttt{self.value} с помощью \texttt{+=}. Также стоит убрать \linebreak\texttt{time.sleep(0.1)} из функции обновления значения.
+
+Теперь код хотя бы выдаёт правильный результат. Но он всё ещё работает неоптимально: вызов функции \texttt{Task.execute} должен отнимать больше времени, чем \texttt{Counter.update}, поэтому логичнее сделать вызов его параллельным, а не наоборот. Сделав параллельным выполнение \texttt{Task} и ожидание выполнения с помощью \texttt{concurrent.futures.as\_completed}, мы сэкономим время, а не запуская параллельно обновление значения (\texttt{Counter.update}) мы точно не получим проблему потери каких-то значений (и вряд ли потеряем много времени, потому что прибавление одного числа не должно быть дорого).
+
+Для упрощения дебага я добавил отладочную информацию, а также в класс задачи ввёл новое поле --- идентификатор задачи, по которому её можно опознавать.
+
+Полный код можно найти в папке \texttt{./B}.
+
+
+
+
+\end{document}
